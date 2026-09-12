@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  FIRM
+  WORKSHOP
+  ADMIN
+}
+
+enum CompanyType {
+  SAHIS
+  KURUMSAL
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum JobStatus {
+  OPEN
+  ASSIGNED
+  IN_PRODUCTION
+  READY
+  DELIVERED
+  COMPLETED
+}
+
+enum BidStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum ProductionStage {
+  SIPARIS_ALINDI
+  DIKIMA_HAZIRLANIYOR
+  URETIM_SURECINDE
+  TESLIME_HAZIR
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+  displayName  String
+  createdAt    DateTime @default(now())
+
+  firmApplication   FirmApplication?
+  workshopProfile   WorkshopProfile?
+  jobRequests       JobRequest[]     @relation("FirmJobs")
+  bids              JobBid[]
+  messagesSent      Message[]        @relation("SentMessages")
+  reviewsGiven      Review[]         @relation("ReviewsGiven")
+  reviewsReceived   Review[]         @relation("ReviewsReceived")
+  sessions          Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model FirmApplication {
+  id              String            @id @default(cuid())
+  userId          String            @unique
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyType     CompanyType
+  officialName    String
+  taxNumber       String
+  taxOffice       String
+  taxPlatePath    String?
+  signaturePath   String?
+  tradeGazettePath String?
+  kvkkAccepted    Boolean
+  termsAccepted   Boolean
+  ndaAccepted     Boolean
+  status          ApplicationStatus @default(PENDING)
+  adminNote       String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model WorkshopProfile {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workshopName  String
+  workerCount   Int
+  machineCount  Int
+  machineModels String?
+  city          String?
+  bio           String?
+  avgRating     Float   @default(0)
+  reviewCount   Int     @default(0)
+}
+
+model JobRequest {
+  id           String    @id @default(cuid())
+  firmId       String
+  firm         User      @relation("FirmJobs", fields: [firmId], references: [id], onDelete: Cascade)
+  category     String
+  quantity     Int
+  deadlineDays Int
+  photoPath    String?
+  description  String?
+  status       JobStatus @default(OPEN)
+  assignedWorkshopId String?
+  productionStage ProductionStage?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  bids     JobBid[]
+  messages Message[]
+  reviews  Review[]
+}
+
+model JobBid {
+  id           String    @id @default(cuid())
+  jobRequestId String
+  jobRequest   JobRequest @relation(fields: [jobRequestId], references: [id], onDelete: Cascade)
+  workshopId   String
+  workshop     User      @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+  message      String?
+  status       BidStatus @default(PENDING)
+  createdAt    DateTime  @default(now())
+
+  @@unique([jobRequestId, workshopId])
+}
+
+model Message {
+  id           String     @id @default(cuid())
+  jobRequestId String
+  jobRequest   JobRequest @relation(fields: [jobRequestId], references: [id], onDelete: Cascade)
+  senderId     String
+  sender       User       @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  body         String
+  createdAt    DateTime   @default(now())
+}
+
+model Review {
+  id           String     @id @default(cuid())
+  jobRequestId String
+  jobRequest   JobRequest @relation(fields: [jobRequestId], references: [id], onDelete: Cascade)
+  fromUserId   String
+  fromUser     User       @relation("ReviewsGiven", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId     String
+  toUser       User       @relation("ReviewsReceived", fields: [toUserId], references: [id], onDelete: Cascade)
+  stars        Int
+  comment      String?
+  createdAt    DateTime   @default(now())
+
+  @@unique([jobRequestId, fromUserId])
+}

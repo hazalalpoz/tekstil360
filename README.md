@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tekstil360
 
-## Getting Started
+Atölye ve firmayı tek çatı altında buluşturan sipariş / üretim takip platformu.
 
-First, run the development server:
+## Özellikler
+
+- **Kurumsal başvuru** — Giriş ekranında evrak yükleme ve yasal onaylar; admin onayı sonrası firma girişi
+- **Atölye kaydı** — E-posta ile kayıt; zorunlu işçi / makine sayısı, opsiyonel makine modelleri
+- **İş talebi** — 9 kategori, adet, temin süresi, model fotoğrafı
+- **Teklif & onay** — Atölyeler teklif verir; firma onaylayınca **canlı sohbet** açılır
+- **Üretim aşamaları** — Sipariş alındı → dikime hazırlanıyor → üretim sürecinde → teslime hazır
+- **Değerlendirme** — Teslim sonrası karşılıklı 5 yıldız; [herkese açık yorumlar](/yorumlar)
+
+## Kurulum
 
 ```bash
+npm install
+npx prisma db push
+npm run db:seed
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tarayıcı: [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Admin (test):** `admin@tekstil360.local` / `admin123` — kurumsal başvuruları onaylar.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Akış
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Firma **Kurumsal Başvuru** ile kayıt olur → admin onaylar → **Giriş Yap**
+2. Firma **Yeni iş talebi** oluşturur
+3. Atölye **Açık işler**den teklif gönderir
+4. Firma teklifi **onaylar** → sohbet başlar
+5. Atölye üretim aşamalarını günceller
+6. Firma **teslim aldım** der → iki taraf birbirini puanlar
