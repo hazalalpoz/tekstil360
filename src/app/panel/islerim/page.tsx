@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PRODUCT_CATEGORIES, PRODUCTION_STAGES } from "@/lib/constants";
 import { redirect } from "next/navigation";
+export const dynamic = "force-dynamic";
 
 function categoryLabel(value: string) {
   return PRODUCT_CATEGORIES.find((c) => c.value === value)?.label ?? value;

@@ -2,6 +2,7 @@ import { ensureAdmin } from "@/app/actions/auth";
 import { approveFirmAction } from "@/app/actions/admin";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/Button";
+export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
   await ensureAdmin();
